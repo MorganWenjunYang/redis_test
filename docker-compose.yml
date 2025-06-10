@@ -9,33 +9,28 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
-  app:
+  api:
     build: .
+    ports:
+      - "5000:5000"
     depends_on:
       - redis
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=1
+    command: python app.py
     restart: unless-stopped
 
-  producer:
+  celery_worker:
     build: .
     depends_on:
       - redis
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-    command: python redis_stream_prod.py
-    restart: unless-stopped
-
-  consumer:
-    build: .
-    depends_on:
-      - redis
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    command: python redis_stream_consumer.py
+    command: celery -A tasks worker --loglevel=info
     restart: unless-stopped
 
 volumes:
