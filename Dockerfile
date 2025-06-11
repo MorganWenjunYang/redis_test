@@ -1,13 +1,19 @@
 # Use Python 3.9 as base image
-FROM python:3.9-slim
+FROM --platform=$BUILDPLATFORM public.ecr.aws/docker/library/python:3.9-slim AS builder
+
 
 # Set working directory
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Install dependencies
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
@@ -22,8 +28,8 @@ RUN useradd -m appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
-# Expose the port your application runs on (if needed)
-EXPOSE 8000
+# Expose the port your application runs on
+EXPOSE 5000
 
-# Command to run the application
-CMD ["celery", "-A", "tasks", "worker", "--loglevel=info"]
+# Default command (can be overridden in docker-compose)
+CMD ["python", "app.py"]
