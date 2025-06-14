@@ -29,7 +29,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{secrets.ALIYUN_REGISTRY}}/${{secrets.ALIYUN_NAMESPACE}}/redis-celery-test:latest
+          tags: ${{secrets.ALIYUN_REGISTRY}}/${{secrets.ALIYUN_NAMESPACE}}/redis_celery_test:latest
           build-args: |
             BUILDKIT_PROGRESS=plain  # Enable verbose logging
 
@@ -37,20 +37,20 @@ jobs:
         run: |
           echo "${{ secrets.REMOTE_KEY }}" > private_key
           chmod 600 private_key
-          scp -i private_key -o StrictHostKeyChecking=no docker-compose.yaml ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:/home/${{ secrets.REMOTE_USER }}/redis-celery-test/
+          scp -i private_key -o StrictHostKeyChecking=no docker-compose.yaml ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:/home/${{ secrets.REMOTE_USER }}/redis_celery_test/
           ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }} << 'EOF'
             # Set proper permissions for docker-compose.yaml
-            chmod 644 /home/${{ secrets.REMOTE_USER }}/redis-celery-test/docker-compose.yaml
+            chmod 644 /home/${{ secrets.REMOTE_USER }}/redis_celery_test/docker-compose.yaml
             
             # Create necessary directories with proper permissions
-            cd /home/${{ secrets.REMOTE_USER }}/redis-celery-test
+            cd /home/${{ secrets.REMOTE_USER }}/redis_celery_test
             # mkdir -p logs/nginx logs/gunicorn static
             # chmod -R 755 logs static
             
             # Log in to Aliyun Registry on the remote server
             echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login ${{ secrets.ALIYUN_REGISTRY }} -u ${{ secrets.ALIYUN_USERNAME }} --password-stdin
          
-            cd /home/${{ secrets.REMOTE_USER }}/redis-celery-test
+            cd /home/${{ secrets.REMOTE_USER }}/redis_celery_test
             docker-compose down
             docker image prune -f # remove all unused images
             docker-compose pull
