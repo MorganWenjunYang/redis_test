@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
 
   api:
-    build: .
+    image: ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_REPOSITORY}:latest 
     ports:
       - "5000:5000"
     depends_on:
@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
 
   celery_worker:
-    build: .
+    image: ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_REPOSITORY}:latest 
     depends_on:
       - redis
     environment:
