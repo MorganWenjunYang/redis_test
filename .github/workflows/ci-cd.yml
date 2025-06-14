@@ -37,6 +37,10 @@ jobs:
         run: |
           echo "${{ secrets.REMOTE_KEY }}" > private_key
           chmod 600 private_key
+          
+          # Create remote directory first
+          ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }} "mkdir -p /home/${{ secrets.REMOTE_USER }}/redis_celery_test"
+          
           scp -i private_key -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:/home/${{ secrets.REMOTE_USER }}/redis_celery_test/
           ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }} << 'EOF'
             # Set proper permissions for docker-compose.yml
